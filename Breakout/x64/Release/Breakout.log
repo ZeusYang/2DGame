@@ -1,27 +1,7 @@
-﻿  ResourceManager.cpp
-  main.cpp
-main.cpp(52): warning C4244: “初始化”: 从“double”转换到“GLfloat”，可能丢失数据
-  stb_image.cpp
-main.obj : error LNK2001: 无法解析的外部符号 glewExperimental
-main.obj : error LNK2001: 无法解析的外部符号 glewInit
-ResourceManager.obj : error LNK2001: 无法解析的外部符号 __imp___glewDeleteProgram
-Shader.obj : error LNK2001: 无法解析的外部符号 __imp___glewUseProgram
-Shader.obj : error LNK2001: 无法解析的外部符号 __imp___glewGetShaderiv
-Shader.obj : error LNK2001: 无法解析的外部符号 __imp___glewCompileShader
-Shader.obj : error LNK2001: 无法解析的外部符号 __imp___glewCreateShader
-Shader.obj : error LNK2001: 无法解析的外部符号 __imp___glewCreateProgram
-Shader.obj : error LNK2001: 无法解析的外部符号 __imp___glewUniform1i
-Shader.obj : error LNK2001: 无法解析的外部符号 __imp___glewGetShaderInfoLog
-Shader.obj : error LNK2001: 无法解析的外部符号 __imp___glewUniform2f
-Shader.obj : error LNK2001: 无法解析的外部符号 __imp___glewGetProgramiv
-Shader.obj : error LNK2001: 无法解析的外部符号 __imp___glewUniform1f
-Shader.obj : error LNK2001: 无法解析的外部符号 __imp___glewGetUniformLocation
-Shader.obj : error LNK2001: 无法解析的外部符号 __imp___glewAttachShader
-Shader.obj : error LNK2001: 无法解析的外部符号 __imp___glewShaderSource
-Shader.obj : error LNK2001: 无法解析的外部符号 __imp___glewUniformMatrix4fv
-Shader.obj : error LNK2001: 无法解析的外部符号 __imp___glewGetProgramInfoLog
-Shader.obj : error LNK2001: 无法解析的外部符号 __imp___glewUniform3f
-Shader.obj : error LNK2001: 无法解析的外部符号 __imp___glewDeleteShader
-Shader.obj : error LNK2001: 无法解析的外部符号 __imp___glewLinkProgram
-Shader.obj : error LNK2001: 无法解析的外部符号 __imp___glewUniform4f
-C:\Users\Yang\Desktop\Breakout\x64\Release\Breakout.exe : fatal error LNK1120: 22 个无法解析的外部命令
+﻿  正在生成代码
+  51 of 1565 functions ( 3.3%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    9 functions had inline decision re-evaluated but remain unchanged
+  已完成代码的生成
+  Breakout.vcxproj -> C:\Users\Yang\Desktop\Breakout\x64\Release\Breakout.exe
+  Breakout.vcxproj -> C:\Users\Yang\Desktop\Breakout\x64\Release\Breakout.pdb (Full PDB)
