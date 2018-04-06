@@ -1,6 +1,7 @@
 //#define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <iostream>
 #include "Game.h"
 #include "ResourceManager.h"
 #pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" )
@@ -21,17 +22,26 @@ int main(int argc, char *argv[])
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
 	GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Breakout", nullptr, nullptr);
+	if (window == NULL) {
+		std::cout << "Failed to create GLFW window" << std::endl;
+		glfwTerminate();
+		return -1;
+	}
 	glfwMakeContextCurrent(window);
-
+	glfwSetKeyCallback(window, key_callback);//键盘回调
 	glewExperimental = GL_TRUE;
-	glewInit();
+	if (glewInit() != GLEW_OK) {
+		std::cout << "Failed to initialize GLEW" << std::endl;
+		return -1;
+	}
+	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	glGetError(); // Call it once to catch glewInit() bug, all other errors are now from our application.
 
-	glfwSetKeyCallback(window, key_callback);//键盘回调
 	// OpenGL configuration
-	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+	
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -67,8 +77,8 @@ int main(int argc, char *argv[])
 		Breakout.Render();
 
 		glfwSwapBuffers(window);
-	}
-
+	} 
+	 
 	// Delete all resources as loaded using the resource manager
 	ResourceManager::Clear();//卸载加载的全部资源
 

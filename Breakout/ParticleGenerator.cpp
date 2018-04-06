@@ -1,18 +1,18 @@
 #include "ParticleGenerator.h"
 
-ParticleGenerator::ParticleGenerator(Shader shader, Texture2D texture, GLuint amount)
-	: shader(shader), texture(texture), amount(amount)
+ParticleGenerator::ParticleGenerator(Shader shader, Texture2D texture, GLuint amount, float s)
+	: shader(shader), texture(texture), amount(amount), scale(s)
 {
 	this->init();
 }
 
-void ParticleGenerator::Update(GLfloat dt, GameObject &object, GLuint newParticles, glm::vec2 offset)
+void ParticleGenerator::Update(GLfloat dt, GameObject &object, GLuint newParticles, glm::vec2 offset, int way)
 {
 	// Add new particles 
 	for (GLuint i = 0; i < newParticles; ++i)
 	{
 		int unusedParticle = this->firstUnusedParticle();//找到第一个未使用的粒子位置
-		this->respawnParticle(this->particles[unusedParticle], object, offset);
+		this->respawnParticle(this->particles[unusedParticle], object, offset, way);
 	}
 	// Update all particles
 	for (GLuint i = 0; i < this->amount; ++i)
@@ -33,12 +33,13 @@ void ParticleGenerator::Draw()
 	// Use additive blending to give it a 'glow' effect
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	this->shader.Use();
-	for (Particle particle : this->particles)
+	for (auto it = particles.begin();it != particles.end();++it)
 	{
-		if (particle.Life > 0.0f)
+		if (it->Life > 0.0f)
 		{
-			this->shader.SetVector2f("offset", particle.Position);
-			this->shader.SetVector4f("color", particle.Color);
+			this->shader.SetVector2f("offset", it->Position);
+			this->shader.SetVector4f("color", it->Color);
+			this->shader.SetFloat("scale", scale);
 			this->texture.Bind();
 			glBindVertexArray(this->VAO);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -74,8 +75,9 @@ void ParticleGenerator::init()
 	glBindVertexArray(0);
 
 	// Create this->amount default particle instances
-	for (GLuint i = 0; i < this->amount; ++i)
-		this->particles.push_back(Particle());
+	this->particles.resize(this->amount, Particle());
+	//for (GLuint i = 0; i < this->amount; ++i)
+	//	this->particles.push_back(Particle());
 }
 
 // Stores the index of the last particle used (for quick access to next dead particle)
@@ -102,18 +104,25 @@ GLuint ParticleGenerator::firstUnusedParticle()
 	return 0;
 }
 
-void ParticleGenerator::respawnParticle(Particle &particle, GameObject &object, glm::vec2 offset)
+void ParticleGenerator::respawnParticle(Particle &particle, GameObject &object, glm::vec2 offset,int way)
 {
 	//随机产生一个粒子
 	//-5到+5的随机数
 	GLfloat random = ((rand() % 100) - 50) / 10.0f;
-	//srand(time(NULL));
 	//随机颜色
 	GLfloat rColor1 = 0.5 + ((rand() % 100) / 100.0f);
-	GLfloat rColor2 = 0.5 + ((rand() % 100) / 100.0f);
-	GLfloat rColor3 = 0.5 + ((rand() % 100) / 100.0f);
+	GLfloat rColor2 = -1.0 + ((rand() % 100) / 100.0f)*2;
+	GLfloat rColor3 = -1.0 + ((rand() % 100) / 100.0f)*2;
 	particle.Position = object.Position + random + offset;
-	particle.Color = glm::vec4(rColor1, rColor2, rColor3, 1.0f);
+	particle.Color = glm::vec4(rColor1, (rColor2 + 1.0f)/2.0f, (rColor3 + 1.0f)/2.0f, 1.0f);
 	particle.Life = 1.0f;
-	particle.Velocity = object.Velocity * 0.2f;
+	if(way == 1)particle.Velocity = object.Velocity * 0.2f;
+	else if (way == 2)particle.Velocity = glm::length(glm::vec2(150,-450)) * 0.3f * glm::vec2(rColor2, rColor3);
+}
+
+void ParticleGenerator::Reset()
+{
+	for (auto &particle : this->particles) {
+		particle.Life = 0.0f;
+	}
 }

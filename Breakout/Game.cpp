@@ -24,7 +24,7 @@ const GLfloat BALL_RADIUS = 25.0f;
 BallObject     *Ball;
 
 //粒子生成器
-ParticleGenerator   *Particles;
+ParticleGenerator   Particles;
 
 //后期特效处理
 PostProcessor   *Effects;
@@ -44,7 +44,7 @@ Game::~Game(){
 	delete Renderer;
 	delete Player;
 	delete Ball;
-	delete Particles;
+	//delete Particles;
 	delete Effects;
 	SoundEngine->drop();
 }
@@ -71,10 +71,11 @@ void Game::Init(){
 	// 加载纹理
 	ResourceManager::LoadTexture("../res/Textures/background.jpg", GL_FALSE, "background");
 	ResourceManager::LoadTexture("../res/Textures/awesomeface.png", GL_TRUE, "face");
-	ResourceManager::LoadTexture("../res/Textures/block.png", GL_FALSE, "block");
-	ResourceManager::LoadTexture("../res/Textures/block_solid.png", GL_FALSE, "block_solid");
+	ResourceManager::LoadTexture("../res/Textures/brick.png", GL_FALSE, "block");
+	ResourceManager::LoadTexture("../res/Textures/brick_solid.png", GL_FALSE, "block_solid");
 	ResourceManager::LoadTexture("../res/Textures/paddle.png", GL_TRUE, "paddle");
-	ResourceManager::LoadTexture("../res/Textures/particle.png", GL_TRUE, "particle");
+	ResourceManager::LoadTexture("../res/Textures/Flare5.BMP", GL_TRUE, "particle");
+	ResourceManager::LoadTexture("../res/Textures/Flare2.png", GL_TRUE, "boom");
 	ResourceManager::LoadTexture("../res/Textures/powerup_speed.png", GL_TRUE, "powerup_speed");
 	ResourceManager::LoadTexture("../res/Textures/powerup_sticky.png", GL_TRUE, "powerup_sticky");
 	ResourceManager::LoadTexture("../res/Textures/powerup_increase.png", GL_TRUE, "powerup_increase");
@@ -107,12 +108,15 @@ void Game::Init(){
 		ResourceManager::GetTexture("face"));
 
 	//粒子效果
-	Particles = new ParticleGenerator(
+	Particles = ParticleGenerator(
 		ResourceManager::GetShader("particle"),
 		ResourceManager::GetTexture("particle"),
-		500
+		500,
+		16.0f
 	);
-
+	//爆炸粒子特效
+	boom = Boom(ResourceManager::GetShader("particle"),
+		ResourceManager::GetTexture("boom"));
 	//后处理特效
 	Effects = new PostProcessor(ResourceManager::GetShader("postprocessing"), this->Width, this->Height);
 	//文本显示
@@ -127,7 +131,20 @@ void Game::Update(GLfloat dt){
 	 Ball->Move(dt, this->Width);
 	 this->DoCollisions();
 	 // Update particles
-	 Particles->Update(dt, *Ball, 4, glm::vec2(Ball->Radius / 2));
+	 Particles.Update(dt, *Ball, 10, glm::vec2(Ball->Radius / 2),2);
+
+	 for (auto x = 0; x < 15; ++x) {
+		 if (boom.alive[x]) {
+			 boom.lifes[x] += dt;
+			 if (boom.lifes[x] > 0.5f) {
+				 boom.lifes[x] = 0.0f;
+				 boom.alive[x] = false;
+				 boom.boom[x].Reset();
+				 continue;
+			 }
+			 boom.boom[x].Update(dt*1.5, boom.target[x], 10, glm::vec2(Ball->Radius / 2), 2);
+		 }
+	 }
 	 // Update PowerUps
 	 this->UpdatePowerUps(dt);
 	 if (Ball->Position.y >= this->Height) // 球是否接触底部边界？
@@ -219,9 +236,14 @@ void Game::Render(){
 			if (!powerUp.Destroyed)
 				powerUp.Draw(*Renderer);
 		// Draw particles   
-		Particles->Draw();
+		Particles.Draw();
 		// Draw ball
 		Ball->Draw(*Renderer);
+		for (auto x = 0; x < 10; ++x) {
+			if (boom.alive[x]) {
+				boom.boom[x].Draw();
+			} 
+		}
 		//后期处理
 		Effects->EndRender();
 		Effects->Render(glfwGetTime());
@@ -231,8 +253,8 @@ void Game::Render(){
 	}
 	if (this->State == GAME_MENU)
 	{
-		Text->RenderText("Press ENTER to start", 250.0f, Height / 2, 1.0f);
-		Text->RenderText("Press W or S to select level", 245.0f, Height / 2 + 20.0f, 0.75f);
+		Text->RenderText("Press ENTER to start", 350.0f, Height / 2, 1.0f);
+		Text->RenderText("Press W or S to select level", 345.0f, Height / 2 + 20.0f, 0.75f);
 	}
 	if (this->State == GAME_WIN)
 	{
@@ -240,12 +262,12 @@ void Game::Render(){
 			"You WON!!!", 420.0, Height / 2 - 20.0, 1.0, glm::vec3(0.0, 1.0, 0.0)
 		);
 		Text->RenderText(
-			"Press ENTER to retry or ESC to quit", 230.0, Height / 2, 1.0, glm::vec3(1.0, 1.0, 0.0)
+			"Press ENTER to retry or ESC to quit", 330.0, Height / 2, 1.0, glm::vec3(1.0, 1.0, 0.0)
 		);
 	}
 }
 
-GLboolean Game::CheckCollisionAABB(GameObject &one, GameObject &two)//AABB碰撞检测
+GLboolean Game::CheckCollisionAABB(GameObject &one, GameObject &two)//AABB包围盒碰撞检测
 {	//我们检查第一个物体的最右侧是否大于第二个物体的最左侧并且第二个物体的最右侧是否大于第一个物体的最左侧；
 	//垂直的轴向与此相似。
 	bool collisionX = one.Position.x + one.Size.x >= two.Position.x
@@ -320,6 +342,23 @@ void Game::DoCollisions() {//检测碰撞
 				if (!box.IsSolid) {
 					box.Destroyed = GL_TRUE;
 					this->SpawnPowerUps(box);
+					//碰撞爆炸特效
+					for (auto x = 0; x < 15; ++x) {
+						if (!boom.alive[x]) {
+							boom.target[x].Position = box.Position;
+							boom.alive[x] = true;
+							boom.lifes[x] = 0.0f;
+							boom.boom[x].Reset();
+							break;
+						}
+						else if (x == 14) {
+							boom.target[0] = box;
+							boom.alive[0] = true;
+							boom.lifes[0] = 0.0f;
+							boom.boom[0].Reset();
+							break;
+						}
+					}
 					SoundEngine->play2D("../res/Audio/bleep.mp3", GL_FALSE);
 				}
 				else {

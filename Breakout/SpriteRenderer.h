@@ -16,8 +16,6 @@ public:
 private:
 	Shader shader;
 	GLuint quadVAO;
-
 	void initRenderData();
-
 };
 

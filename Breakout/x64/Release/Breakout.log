@@ -1,7 +1,21 @@
-﻿  正在生成代码
-  51 of 1565 functions ( 3.3%) were compiled, the rest were copied from previous compilation.
+﻿  Game.cpp
+Game.cpp(87): warning C4244: “参数”: 从“double”转换到“GLuint”，可能丢失数据
+Game.cpp(88): warning C4244: “参数”: 从“double”转换到“GLuint”，可能丢失数据
+Game.cpp(89): warning C4244: “参数”: 从“double”转换到“GLuint”，可能丢失数据
+Game.cpp(90): warning C4244: “参数”: 从“double”转换到“GLuint”，可能丢失数据
+Game.cpp(145): warning C4244: “参数”: 从“double”转换到“GLfloat”，可能丢失数据
+Game.cpp(249): warning C4244: “参数”: 从“double”转换到“GLfloat”，可能丢失数据
+Game.cpp(256): warning C4244: “参数”: 从“GLuint”转换到“GLfloat”，可能丢失数据
+Game.cpp(263): warning C4244: “参数”: 从“double”转换到“GLfloat”，可能丢失数据
+Game.cpp(266): warning C4244: “参数”: 从“GLuint”转换到“GLfloat”，可能丢失数据
+Game.cpp(451): warning C4244: “参数”: 从“float”转换到“GLuint”，可能丢失数据
+Game.cpp(453): warning C4244: “参数”: 从“float”转换到“GLuint”，可能丢失数据
+Game.cpp(455): warning C4244: “参数”: 从“float”转换到“GLuint”，可能丢失数据
+Game.cpp(457): warning C4244: “参数”: 从“float”转换到“GLuint”，可能丢失数据
+  正在生成代码
+  39 of 1599 functions ( 2.4%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    9 functions had inline decision re-evaluated but remain unchanged
+    10 functions had inline decision re-evaluated but remain unchanged
   已完成代码的生成
   Breakout.vcxproj -> C:\Users\Yang\Desktop\Breakout\x64\Release\Breakout.exe
   Breakout.vcxproj -> C:\Users\Yang\Desktop\Breakout\x64\Release\Breakout.pdb (Full PDB)

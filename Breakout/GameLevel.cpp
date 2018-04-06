@@ -58,6 +58,7 @@ void GameLevel::init(std::vector<std::vector<GLuint>> tileData, GLuint lvlWidth,
 
 				glm::vec2 pos(unit_width * x, unit_height * y);
 				glm::vec2 size(unit_width, unit_height);
+				glm::vec2 velocity = glm::vec2(150, -450);
 				this->Bricks.push_back(
 					GameObject(pos, size, ResourceManager::GetTexture("block"), color)
 				);
