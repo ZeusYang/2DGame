@@ -33,19 +33,20 @@ void ParticleGenerator::Draw()
 	// Use additive blending to give it a 'glow' effect
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	this->shader.Use();
-	for (auto it = particles.begin();it != particles.end();++it)
-	{
-		if (it->Life > 0.0f)
-		{
+	this->texture.Bind();
+	glBindVertexArray(this->VAO);
+	for (std::vector<Particle>::iterator it = particles.begin();
+		it < particles.end();
+		++it){
+		if (it->Life > 0.0f){
 			this->shader.SetVector2f("offset", it->Position);
 			this->shader.SetVector4f("color", it->Color);
-			this->shader.SetFloat("scale", scale);
-			this->texture.Bind();
-			glBindVertexArray(this->VAO);
+			this->shader.SetFloat("scale", this->scale);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
-			glBindVertexArray(0);
 		}
 	}
+	glBindVertexArray(0);
+	glUseProgram(0);
 	// Don't forget to reset to default blending mode
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
@@ -73,9 +74,11 @@ void ParticleGenerator::init()
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
 	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	// Create this->amount default particle instances
-	this->particles.resize(this->amount, Particle());
+	this->particles = std::vector<Particle>(this->amount, Particle());
+	//this->particles.resize(this->amount, Particle());
 	//for (GLuint i = 0; i < this->amount; ++i)
 	//	this->particles.push_back(Particle());
 }
@@ -114,10 +117,10 @@ void ParticleGenerator::respawnParticle(Particle &particle, GameObject &object, 
 	GLfloat rColor2 = -1.0 + ((rand() % 100) / 100.0f)*2;
 	GLfloat rColor3 = -1.0 + ((rand() % 100) / 100.0f)*2;
 	particle.Position = object.Position + random + offset;
-	particle.Color = glm::vec4(rColor1, (rColor2 + 1.0f)/2.0f, (rColor3 + 1.0f)/2.0f, 1.0f);
+	particle.Color = glm::vec4(rColor1, (rColor2 + 1.0f)/2.0f*0.6f, (rColor3 + 1.0f)/2.0f*0.6f, 1.0f);
 	particle.Life = 1.0f;
 	if(way == 1)particle.Velocity = object.Velocity * 0.2f;
-	else if (way == 2)particle.Velocity = glm::length(glm::vec2(150,-450)) * 0.3f * glm::vec2(rColor2, rColor3);
+	else if (way == 2)particle.Velocity = glm::length(glm::vec2(150,-450)) * 0.2f * glm::vec2(rColor2, rColor3);
 }
 
 void ParticleGenerator::Reset()

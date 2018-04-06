@@ -69,9 +69,9 @@ void Game::Init(){
 	Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
 
 	// 加载纹理
-	ResourceManager::LoadTexture("../res/Textures/background.jpg", GL_FALSE, "background");
-	ResourceManager::LoadTexture("../res/Textures/awesomeface.png", GL_TRUE, "face");
-	ResourceManager::LoadTexture("../res/Textures/brick.png", GL_FALSE, "block");
+	ResourceManager::LoadTexture("../res/Textures/timg.jpg", GL_FALSE, "background");
+	ResourceManager::LoadTexture("../res/Textures/face.png", GL_TRUE, "face");
+	ResourceManager::LoadTexture("../res/Textures/solid.png", GL_FALSE, "block");
 	ResourceManager::LoadTexture("../res/Textures/brick_solid.png", GL_FALSE, "block_solid");
 	ResourceManager::LoadTexture("../res/Textures/paddle.png", GL_TRUE, "paddle");
 	ResourceManager::LoadTexture("../res/Textures/Flare5.BMP", GL_TRUE, "particle");
@@ -136,13 +136,13 @@ void Game::Update(GLfloat dt){
 	 for (auto x = 0; x < 15; ++x) {
 		 if (boom.alive[x]) {
 			 boom.lifes[x] += dt;
-			 if (boom.lifes[x] > 0.5f) {
+			 if (boom.lifes[x] > 0.6f) {
 				 boom.lifes[x] = 0.0f;
 				 boom.alive[x] = false;
 				 boom.boom[x].Reset();
 				 continue;
 			 }
-			 boom.boom[x].Update(dt*1.5, boom.target[x], 10, glm::vec2(Ball->Radius / 2), 2);
+			 boom.boom[x].Update(dt, boom.target[x], 0, glm::vec2(Ball->Radius / 2), 2);
 		 }
 	 }
 	 // Update PowerUps
@@ -304,7 +304,7 @@ void ActivatePowerUp(PowerUp &powerUp)
 	// 根据道具类型发动道具
 	if (powerUp.Type == "speed")
 	{
-		Ball->Velocity *= 1.2;
+		Ball->Velocity *= 1.5;
 	}
 	else if (powerUp.Type == "sticky")
 	{
@@ -349,6 +349,7 @@ void Game::DoCollisions() {//检测碰撞
 							boom.alive[x] = true;
 							boom.lifes[x] = 0.0f;
 							boom.boom[x].Reset();
+							boom.boom[x].Update(0.05f, boom.target[x], 280, glm::vec2(Ball->Radius / 2), 2);
 							break;
 						}
 						else if (x == 14) {
@@ -536,16 +537,16 @@ void Game::UpdatePowerUps(GLfloat dt)
 
 void Game::SpawnPowerUps(GameObject &block)
 {
-	if (ShouldSpawn(75)) // 1 in 75 chance
+	if (ShouldSpawn(25)) // 1 in 75 chance
 		this->PowerUps.push_back(PowerUp("speed", glm::vec3(0.5f, 0.5f, 1.0f), 0.0f,
 			block.Position, ResourceManager::GetTexture("powerup_speed")));
-	if (ShouldSpawn(75))
+	if (ShouldSpawn(25))
 		this->PowerUps.push_back(PowerUp("sticky", glm::vec3(1.0f, 0.5f, 1.0f), 20.0f,
 			block.Position, ResourceManager::GetTexture("powerup_sticky")));
-	if (ShouldSpawn(75))
+	if (ShouldSpawn(25))
 		this->PowerUps.push_back(PowerUp("pass-through", glm::vec3(0.5f, 1.0f, 0.5f), 
 			10.0f, block.Position, ResourceManager::GetTexture("powerup_passthrough")));
-	if (ShouldSpawn(75))
+	if (ShouldSpawn(25))
 		this->PowerUps.push_back(PowerUp("pad-size-increase", glm::vec3(1.0f, 0.6f, 0.4),
 			0.0f, block.Position, ResourceManager::GetTexture("powerup_increase")));
 	if (ShouldSpawn(15)) // Negative powerups should spawn more often

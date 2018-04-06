@@ -4,7 +4,7 @@
 #include <iostream>
 #include "Game.h"
 #include "ResourceManager.h"
-#pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" )
+//#pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" )
 // GLFW function declerations
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 // The Width of the screen

@@ -150,6 +150,7 @@
       <AdditionalLibraryDirectories>C:\Users\Yang\Desktop\Breakout\packages\Winx64-visualStudio;C:\Users\Yang\Desktop\Breakout\packages\nupengl.core.0.1.0.1\build\native\lib\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glew32.lib;irrKlang.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
+      <StackReserveSize>100000</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

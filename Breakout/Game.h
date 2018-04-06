@@ -36,7 +36,7 @@ struct Boom {
 		for (auto x = 0; x < 15; ++x) {
 			lifes[x] = 0.0f;
 			alive[x] = false;
-			boom[x] = ParticleGenerator(shader, tex, 200, 30.0f);
+			boom[x] = ParticleGenerator(shader, tex, 200, 40.0f);
 		}
 	}
 };

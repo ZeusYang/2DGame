@@ -1,21 +1,12 @@
-﻿  Game.cpp
-Game.cpp(87): warning C4244: “参数”: 从“double”转换到“GLuint”，可能丢失数据
-Game.cpp(88): warning C4244: “参数”: 从“double”转换到“GLuint”，可能丢失数据
-Game.cpp(89): warning C4244: “参数”: 从“double”转换到“GLuint”，可能丢失数据
-Game.cpp(90): warning C4244: “参数”: 从“double”转换到“GLuint”，可能丢失数据
-Game.cpp(145): warning C4244: “参数”: 从“double”转换到“GLfloat”，可能丢失数据
-Game.cpp(249): warning C4244: “参数”: 从“double”转换到“GLfloat”，可能丢失数据
-Game.cpp(256): warning C4244: “参数”: 从“GLuint”转换到“GLfloat”，可能丢失数据
-Game.cpp(263): warning C4244: “参数”: 从“double”转换到“GLfloat”，可能丢失数据
-Game.cpp(266): warning C4244: “参数”: 从“GLuint”转换到“GLfloat”，可能丢失数据
-Game.cpp(451): warning C4244: “参数”: 从“float”转换到“GLuint”，可能丢失数据
-Game.cpp(453): warning C4244: “参数”: 从“float”转换到“GLuint”，可能丢失数据
-Game.cpp(455): warning C4244: “参数”: 从“float”转换到“GLuint”，可能丢失数据
-Game.cpp(457): warning C4244: “参数”: 从“float”转换到“GLuint”，可能丢失数据
+﻿  ParticleGenerator.cpp
+ParticleGenerator.cpp(25): warning C4244: “-=”: 从“double”转换到“float”，可能丢失数据
+ParticleGenerator.cpp(116): warning C4244: “初始化”: 从“double”转换到“GLfloat”，可能丢失数据
+ParticleGenerator.cpp(117): warning C4244: “初始化”: 从“double”转换到“GLfloat”，可能丢失数据
+ParticleGenerator.cpp(118): warning C4244: “初始化”: 从“double”转换到“GLfloat”，可能丢失数据
   正在生成代码
-  39 of 1599 functions ( 2.4%) were compiled, the rest were copied from previous compilation.
+  46 of 1577 functions ( 2.9%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    10 functions had inline decision re-evaluated but remain unchanged
+    7 functions had inline decision re-evaluated but remain unchanged
   已完成代码的生成
   Breakout.vcxproj -> C:\Users\Yang\Desktop\Breakout\x64\Release\Breakout.exe
   Breakout.vcxproj -> C:\Users\Yang\Desktop\Breakout\x64\Release\Breakout.pdb (Full PDB)
