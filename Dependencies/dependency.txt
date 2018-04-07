@@ -1,0 +1,5 @@
+opengl32.lib
+freetype28.lib
+glew32.lib
+glfw3dll.lib
+irrKlang.lib

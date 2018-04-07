@@ -1,1 +1,0 @@
-﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppCommon.targets(356,5): error MSB6003: 指定的任务可执行文件“CL.exe”未能运行。文件“C:\USERS\YANG\DESKTOP\BREAKOUT\BREAKOUT\RELEASE\GAME.OBJ”正由另一进程使用，因此该进程无法访问此文件。
