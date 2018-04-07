@@ -2,18 +2,19 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include "Game.h"
 #include "ResourceManager.h"
-#pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" )
+//#pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" )
 // GLFW function declerations
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 // The Width of the screen
-const GLuint SCREEN_WIDTH = 1000;
+const GLuint SCREEN_WIDTH = 800;
 // The height of the screen
 const GLuint SCREEN_HEIGHT = 800;
 
+Game snake(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]){
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -48,6 +49,8 @@ int main(int argc, char *argv[])
 	GLfloat deltaTime = 0.0f;
 	GLfloat lastFrame = 0.0f;
 
+	//初始化
+	snake.Init();
 
 	while (!glfwWindowShouldClose(window)){
 		// Calculate delta time，计算连续帧之间的时间
@@ -55,13 +58,15 @@ int main(int argc, char *argv[])
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 		glfwPollEvents();//检测事件
-
-
+		//处理用户输入
+		snake.ProcessInput(deltaTime);
+		//更新
+		snake.Update(deltaTime);
 
 		// Render
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);//不需要开启深度测试
-
+		snake.Render();
 
 		glfwSwapBuffers(window);
 	} 
@@ -80,11 +85,11 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	if (key >= 0 && key < 1024){
-		//if (action == GLFW_PRESS)
-		//	Breakout.Keys[key] = GL_TRUE;
-		//else if (action == GLFW_RELEASE) {
-		//	Breakout.Keys[key] = GL_FALSE;
-		//	Breakout.KeysProcessed[key] = GL_FALSE;
-		//}
+		if (action == GLFW_PRESS)
+			snake.Keys[key] = GL_TRUE;
+		else if (action == GLFW_RELEASE) {
+			snake.Keys[key] = GL_FALSE;
+			snake.KeysProcessed[key] = GL_FALSE;
+		}
 	}
 }
