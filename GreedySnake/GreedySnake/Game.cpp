@@ -1,9 +1,14 @@
 #include "Game.h"
+#include "CollisionDetect.h"
 #include "ResourceManager.h"
+#include "Menu.h"
+#include <iostream>
+#include <sstream>
 
 Game::Game(GLuint width, GLuint height)
-	:Width(width),Height(height),State(GAME_ACTIVE), unitX(50), unitY(50),
-	gridX(Width /unitX),gridY(Height/unitY),timer(0.0f)
+	:Width(width),Height(height),State(GAME_MENU), unitX(30), unitY(30),
+	gridX(Width /unitX),gridY(Height/unitY),timer(0.0f), firetimer(0.0f)
+	,mode(1),score(0)
 {
 	InitVelocity = glm::vec2(+unitX, +0);
 }
@@ -35,9 +40,10 @@ void Game::Init() {
 	sprite = std::make_shared<SpriteRenderer>(ResourceManager::GetShader("sprite"));
 
 	// 加载纹理
-	ResourceManager::LoadTexture("../res/Textures/timg.jpg", GL_FALSE, "background");
+	ResourceManager::LoadTexture("../res/Textures/background.png", GL_FALSE, "background");
 	ResourceManager::LoadTexture("../res/Textures/body.png", GL_FALSE, "snakebody");
-	ResourceManager::LoadTexture("../res/Textures/food.png", GL_FALSE, "food");
+	ResourceManager::LoadTexture("../res/Textures/Light.png", GL_FALSE, "temptation");
+	ResourceManager::LoadTexture("../res/Textures/Light.png", GL_FALSE, "boom");
 
 	//蛇
 	glm::vec2 headPos = glm::vec2(
@@ -48,9 +54,12 @@ void Game::Init() {
 
 	//食物
 	food = std::make_shared<GameObject>(glm::vec2(0.0, 0.0), glm::vec2(unitX, unitY),
-		ResourceManager::GetTexture("food"));
+		ResourceManager::GetTexture("snakebody"));
 	SetFoodPos();
-
+	food->Velocity = glm::vec2(300, 300);
+	firework = std::make_shared<GameObject>(glm::vec2(0.0, 0.0), glm::vec2(unitX, unitY),
+		ResourceManager::GetTexture("snakebody"));
+	firework->Velocity = glm::vec2(200, 200);
 	//后处理特效
 	effects = std::make_shared<PostProcessor>(ResourceManager::GetShader("postprocessing"),
 		this->Width, this->Height);
@@ -58,7 +67,24 @@ void Game::Init() {
 	text = std::make_shared<TextRenderer>(this->Width, this->Height);
 	text->Load("../res/Fonts/ocraext.TTF", 24);
 	//背景音乐
-	sound->play2D("../res/Audio/breakout.mp3", GL_TRUE);
+	sound->play2D("../res/Audio/greedysnake.mp3", GL_TRUE);
+	//粒子特效
+	temptation = std::make_shared<ParticleGenerator>(
+		ResourceManager::GetShader("particle"),
+		ResourceManager::GetTexture("temptation"),
+		800,//粒子数量
+		unitX,//粒子大小
+		1.5f,//粒子最终寿命
+		1.0/1.5f//透明度衰减速度
+		);
+	boom = std::make_shared<ParticleGenerator>(
+		ResourceManager::GetShader("particle"),
+		ResourceManager::GetTexture("boom"),
+		410,//粒子数量
+		unitX*1.5,//粒子大小
+		2.0f,//粒子最终寿命
+		1.0f/2.0f//透明度衰减速度
+		);
 }
 
 //处理输入
@@ -66,45 +92,145 @@ void Game::ProcessInput(GLfloat dt) {
 	if (this->State == GAME_ACTIVE) {
 		// 移动挡板
 		if (this->Keys[GLFW_KEY_A]) {//左移
-			snake->Velocity = glm::vec2(-unitX, 0);
-			snake->ChangeHeadDir();
+			if (snake->Velocity != glm::vec2(+unitX, 0)) {//不能往相反的方向走
+				snake->nextdir = glm::vec2(-unitX, 0);
+				KeysProcessed[GLFW_KEY_A] = GL_TRUE;
+			}
 		}
 		if (this->Keys[GLFW_KEY_D]) {//右移
-			snake->Velocity = glm::vec2(+unitX, 0);
-			snake->ChangeHeadDir();
+			if (snake->Velocity != glm::vec2(-unitX, 0)) {//不能往相反的方向走
+				snake->nextdir = glm::vec2(+unitX, 0);
+				KeysProcessed[GLFW_KEY_D] = GL_TRUE;
+			}
 		}
 		if (this->Keys[GLFW_KEY_W]) {//上移
-			snake->Velocity = glm::vec2(0, -unitY);
-			snake->ChangeHeadDir();
+			if (snake->Velocity != glm::vec2(0, +unitY)) {//不能往相反的方向走
+				snake->nextdir = glm::vec2(0, -unitY);
+				KeysProcessed[GLFW_KEY_W] = GL_TRUE;
+			}
 		}
 		if (this->Keys[GLFW_KEY_S]) {//下移
-			snake->Velocity = glm::vec2(0, +unitY);
-			snake->ChangeHeadDir();
+			if (snake->Velocity != glm::vec2(0, -unitY)) {//不能往相反的方向走
+				snake->nextdir = glm::vec2(0, +unitY);
+				KeysProcessed[GLFW_KEY_S] = GL_TRUE;
+			}
+		}
+	}
+	if (this->State == GAME_MENU) {
+		if (this->Keys[GLFW_KEY_ENTER] && !this->KeysProcessed[GLFW_KEY_ENTER]) {//确定
+			this->State = GAME_ACTIVE;
+			this->KeysProcessed[GLFW_KEY_ENTER] = GL_TRUE;
+			Reset();
+		}
+		if (this->Keys[GLFW_KEY_1] && !this->KeysProcessed[GLFW_KEY_1]) {//玩家模式
+			this->mode = 1;
+			this->KeysProcessed[GLFW_KEY_1] = GL_TRUE;
+		}
+		if (this->Keys[GLFW_KEY_2] && !this->KeysProcessed[GLFW_KEY_2]) {//AI模式
+			this->mode = 2;
+			this->KeysProcessed[GLFW_KEY_2] = GL_TRUE;
+		}
+	}
+	if (this->State == GAME_LOST || this->State == GAME_WIN) {//游戏输赢之后按确定重新游戏
+		if (this->Keys[GLFW_KEY_ENTER] && !this->KeysProcessed[GLFW_KEY_ENTER]){
+			this->KeysProcessed[GLFW_KEY_ENTER] = GL_TRUE;
+			this->State = GAME_MENU;
+			Reset();
 		}
 	}
 }
 
 //游戏更新
 void Game::Update(GLfloat dt) {
-	timer += dt;
-	snake->Move(dt);
+	if (this->State == GAME_ACTIVE) {//游戏激活状态才更新
+		//timer += dt;
+
+		//蛇身移动
+		snake->Move(dt);
+		//timer = 0.0f;
+
+		//做碰撞检测
+		DoCollisions();
+	}
+
+	//粒子更新
+	temptation->Update(dt, *food, 8, food->Size / 20.f, 2);
+	//烟花爆炸
+	if (firetimer > 0) {
+		firetimer -= dt;
+		boom->Update(dt, *firework, 0, firework->Size / 2.0f, 3);
+	}
+	else if (State != GAME_ACTIVE) {//非激活状态随机位置绽放烟花
+		firetimer = 2.0f;
+		//随机位置
+		int x1 = rand() % gridX;
+		int y1 = rand() % gridY;
+		firework->Position = glm::vec2(x1*unitX, y1*unitY);
+		boom->Reset();
+		boom->Update(0.f, *firework, 400, firework->Size / 2.0f, 3);
+	}
 }
 
 //渲染
 void Game::Render() {
-	// 绘制背景
-	sprite->DrawSprite(ResourceManager::GetTexture("background"),
-		glm::vec2(0, 0), glm::vec2(this->Width, this->Height), 0.0f
-	);
-	//蛇身
-	snake->Draw(*sprite);
-	//食物
-	food->Draw(*sprite);
+	std::stringstream ss; ss << this->score;
+	if (this->State == GAME_ACTIVE || this->State == GAME_MENU || this->State == GAME_WIN || this->State == GAME_LOST) {
+		// 绘制背景
+		sprite->DrawSprite(ResourceManager::GetTexture("background"),
+			glm::vec2(0, 0), glm::vec2(this->Width, this->Height), 0.0f
+		);
+		//蛇身
+		snake->Draw(*sprite);
+		//食物
+		food->Draw(*sprite);
+		//粒子
+		temptation->Draw();
+		//烟花爆炸
+		if(firetimer>0)boom->Draw();
+		//分数
+		text->RenderText("Score:" + ss.str(), 5.0f, 5.0f, 1.0f);
+	}
+	if (this->State == GAME_MENU) {
+		Menu::Selection(*text, this->Width, this->Height);
+	}
+	if (this->State == GAME_WIN) {
+		Menu::Win(*text, this->Width, this->Height);
+	}
+	if(this->State == GAME_LOST){
+		//分数
+		Menu::Lost(*text, this->Width, this->Height, ss.str());
+	}
 }
 
 //碰撞检测
 void Game::DoCollisions() {
+	if (State == GAME_ACTIVE) {
+		//贪吃蛇吃到食物
+		if (CollisionDetect::CheckCollision2(*snake, *food)) {
+			snake->AddBody(food->Position);//增加一节蛇身
+			//发射爆炸烟
+			firetimer = 2.0f;
+			firework->Position = food->Position;
+			boom->Reset();
+			boom->Update(0.f, *firework, 400, firework->Size / 2.0f, 3);
+			SetFoodPos();//重新生成食物
+			sound->play2D("../res/Audio/get.wav", GL_FALSE);
+			//获取一分
+			++score;
+		}
 
+		//撞到墙壁
+		if (CollisionDetect::CheckCollisionWidthWall(*snake, this->Width, this->Height)) {
+			this->State = GAME_LOST;
+			sound->play2D("../res/Audio/dead.mp3", GL_FALSE);
+		}
+		
+		//自己吃自己
+		if (snake->isCollisionSelf()) {
+			this->State = GAME_LOST;
+			sound->play2D("../res/Audio/dead.mp3", GL_FALSE);
+		}
+	}
 }
 
 //设置食物位置
@@ -112,4 +238,15 @@ void Game::SetFoodPos() {
 	int x1 = rand() % gridX;
 	int y1 = rand() % gridY;
 	food->Position = glm::vec2(x1*unitX, y1*unitY);
+}
+
+//重置至初始状态
+void Game::Reset(){
+	timer = 0.0f;
+	firetimer = 0.0f;
+	score = 0;
+	glm::vec2 headPos = glm::vec2(
+		(gridX - 1) / 2 * unitX, (gridY - 1) / 2 * unitY
+	);
+	snake->Reset(headPos, InitVelocity);
 }

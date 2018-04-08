@@ -2,10 +2,11 @@
 #include <list>
 #include <glm/glm.hpp>
 #include "GameObject.h"
+#include "CollisionDetect.h"
 
 struct Body {//蛇身
 	glm::vec2 pos;
-	glm::vec2 target;//记录每次的目标位置
+	glm::vec2 velocity;//记录每段蛇身的方向
 	glm::vec3 Color;//每段蛇身的颜色
 	Body(GLfloat r, GLfloat c) :pos(glm::vec2(r,c)) {
 		int decision = rand() % 4;
@@ -19,11 +20,15 @@ struct Body {//蛇身
 		}
 	}
 };
+const int totalFrame = 9;
+const float perFrame = 0.125;
 
 class SnakeObject :
 	public GameObject
 {
 public:
+	//下一个方向
+	glm::vec2 nextdir;
 	SnakeObject(glm::vec2 pos, GLfloat radius, glm::vec2 velocity, Texture2D sprite);
 	~SnakeObject();
 
@@ -33,12 +38,15 @@ public:
 	void Move(GLfloat dt);
 	//重置
 	void Reset(glm::vec2 position, glm::vec2 velocity);
-	//改变蛇头方向
-	void ChangeHeadDir();
 	//渲染
 	void Draw(SpriteRenderer &renderer);
+	//获取蛇头位置
+	glm::vec2 GetHeadPos();
+	//自己吃自己
+	bool isCollisionSelf();
 private:
 	std::list<Body> snake;
-	glm::vec2 headdir;
+	int frameCounter;
+	float test;
 };
 

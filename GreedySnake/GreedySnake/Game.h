@@ -8,6 +8,7 @@ using namespace irrklang;
 #include "Texture2D.h"
 #include "TextRenderer.h"
 #include "PostProcessor.h"
+#include "ParticleGenerator.h"
 #include "SnakeObject.h"
 #include "GameObject.h"
 
@@ -50,13 +51,23 @@ private:
 	std::shared_ptr<ISoundEngine> sound;
 	std::shared_ptr<SnakeObject> snake;
 	std::shared_ptr<GameObject> food;
+	std::shared_ptr<GameObject> firework;
+	std::shared_ptr<ParticleGenerator> temptation, boom;
 	//单元格子大小
 	int unitX, unitY;
 	GLuint gridX, gridY;
 	glm::vec2 InitVelocity;//初始蛇的速度
 	double timer;//计时器
-
+	double firetimer;
 	//设置食物位置
 	void SetFoodPos();
+	
+	//游戏模式
+	int mode;
+	//当前分数
+	int score;
+
+	//重置至初始状态
+	void Reset();
 };
 

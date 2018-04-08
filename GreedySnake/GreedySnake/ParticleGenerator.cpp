@@ -1,7 +1,9 @@
 #include "ParticleGenerator.h"
+#include <iostream>
 
-ParticleGenerator::ParticleGenerator(Shader shader, Texture2D texture, GLuint amount, float s)
-	: shader(shader), texture(texture), amount(amount), scale(s)
+ParticleGenerator::ParticleGenerator(Shader shader, Texture2D texture, 
+	GLuint amount, float s, float l, float a)
+	: shader(shader), texture(texture), amount(amount), scale(s), life(l), a_atten(a)
 {
 	this->init();
 }
@@ -9,8 +11,7 @@ ParticleGenerator::ParticleGenerator(Shader shader, Texture2D texture, GLuint am
 void ParticleGenerator::Update(GLfloat dt, GameObject &object, GLuint newParticles, glm::vec2 offset, int way)
 {
 	// Add new particles 
-	for (GLuint i = 0; i < newParticles; ++i)
-	{
+	for (GLuint i = 0; i < newParticles; ++i){
 		int unusedParticle = this->firstUnusedParticle();//找到第一个未使用的粒子位置
 		this->respawnParticle(this->particles[unusedParticle], object, offset, way);
 	}
@@ -22,7 +23,7 @@ void ParticleGenerator::Update(GLfloat dt, GameObject &object, GLuint newParticl
 		if (p.Life > 0.0f)
 		{	// particle is alive, thus update
 			p.Position -= p.Velocity * dt;
-			p.Color.a -= dt * 2.5;
+			p.Color.a -= dt * a_atten;
 		}
 	}
 }
@@ -36,7 +37,7 @@ void ParticleGenerator::Draw()
 	this->texture.Bind();
 	glBindVertexArray(this->VAO);
 	for (std::vector<Particle>::iterator it = particles.begin();
-		it < particles.end();
+		it != particles.end();
 		++it){
 		if (it->Life > 0.0f){
 			this->shader.SetVector2f("offset", it->Position);
@@ -117,10 +118,24 @@ void ParticleGenerator::respawnParticle(Particle &particle, GameObject &object, 
 	GLfloat rColor2 = -1.0 + ((rand() % 100) / 100.0f)*2;
 	GLfloat rColor3 = -1.0 + ((rand() % 100) / 100.0f)*2;
 	particle.Position = object.Position + random + offset;
-	particle.Color = glm::vec4(rColor1, (rColor2 + 1.0f)/2.0f*0.6f, (rColor3 + 1.0f)/2.0f*0.6f, 1.0f);
-	particle.Life = 1.0f;
-	if(way == 1)particle.Velocity = object.Velocity * 0.2f;
-	else if (way == 2)particle.Velocity = glm::length(glm::vec2(150,-450)) * 0.2f * glm::vec2(rColor2, rColor3);
+	particle.Life = life;
+	if (way == 1) {
+		particle.Velocity = object.Velocity * 0.2f;
+		particle.Color = glm::vec4(rColor1, (rColor2 + 1.0f) / 2.0f*0.6f, (rColor3 + 1.0f) / 2.0f*0.6f, 1.0f);
+	}
+	else if (way == 2) {
+		particle.Velocity = glm::length(object.Velocity) * 0.4f * glm::vec2(rColor2, rColor3);
+		particle.Color = glm::vec4(rColor1, (rColor2 + 1.0f) / 2.0f*0.6f, (rColor3 + 1.0f) / 2.0f*0.6f, 1.0f);
+	}
+	else if (way == 3) {
+		glm::vec3 dir;
+		dir.x = cos(180.0f*rColor2);
+		dir.y = sin(180.0f*rColor2);
+		GLfloat len = glm::length(object.Velocity);
+		particle.Velocity = len * 0.4f * dir;
+		particle.Color = glm::vec4(rColor1, (rColor2 + 1.0f) / 2.0f*0.8f,(rColor3 + 1.0f) / 2.0f*0.3f, 1.0f);
+	}
+	//glm::vec2(150, -450)
 }
 
 void ParticleGenerator::Reset()
