@@ -1,6 +1,7 @@
 #pragma once
 #include <list>
 #include <glm/glm.hpp>
+#include "Algorithm.h"
 #include "GameObject.h"
 #include "CollisionDetect.h"
 
@@ -34,8 +35,10 @@ public:
 
 	//添加蛇身
 	void AddBody(glm::vec2 pos);
-	//移动蛇身
-	void Move(GLfloat dt);
+	//移动蛇身，玩家模式
+	void Move(GLfloat dt, Algorithm &algorithm);
+	//移动蛇身，AI模式
+	void MoveByAi(glm::vec2 step, Algorithm &algorithm);
 	//重置
 	void Reset(glm::vec2 position, glm::vec2 velocity);
 	//渲染
@@ -47,6 +50,5 @@ public:
 private:
 	std::list<Body> snake;
 	int frameCounter;
-	float test;
 };
 

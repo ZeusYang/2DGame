@@ -11,6 +11,7 @@ using namespace irrklang;
 #include "ParticleGenerator.h"
 #include "SnakeObject.h"
 #include "GameObject.h"
+#include "Algorithm.h"
 
 //游戏状态
 enum GameState {
@@ -53,6 +54,8 @@ private:
 	std::shared_ptr<GameObject> food;
 	std::shared_ptr<GameObject> firework;
 	std::shared_ptr<ParticleGenerator> temptation, boom;
+	//算法
+	std::shared_ptr<Algorithm> algorithm;
 	//单元格子大小
 	int unitX, unitY;
 	GLuint gridX, gridY;

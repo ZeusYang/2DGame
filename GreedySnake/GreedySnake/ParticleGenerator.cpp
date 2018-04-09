@@ -124,7 +124,10 @@ void ParticleGenerator::respawnParticle(Particle &particle, GameObject &object, 
 		particle.Color = glm::vec4(rColor1, (rColor2 + 1.0f) / 2.0f*0.6f, (rColor3 + 1.0f) / 2.0f*0.6f, 1.0f);
 	}
 	else if (way == 2) {
-		particle.Velocity = glm::length(object.Velocity) * 0.4f * glm::vec2(rColor2, rColor3);
+		glm::vec3 dir;
+		dir.x = cos(180.0f*rColor2);
+		dir.y = sin(180.0f*rColor2);
+		particle.Velocity = glm::length(object.Velocity) * 0.4f * dir;
 		particle.Color = glm::vec4(rColor1, (rColor2 + 1.0f) / 2.0f*0.6f, (rColor3 + 1.0f) / 2.0f*0.6f, 1.0f);
 	}
 	else if (way == 3) {
@@ -135,7 +138,6 @@ void ParticleGenerator::respawnParticle(Particle &particle, GameObject &object, 
 		particle.Velocity = len * 0.4f * dir;
 		particle.Color = glm::vec4(rColor1, (rColor2 + 1.0f) / 2.0f*0.8f,(rColor3 + 1.0f) / 2.0f*0.3f, 1.0f);
 	}
-	//glm::vec2(150, -450)
 }
 
 void ParticleGenerator::Reset()
