@@ -22,9 +22,11 @@ class ParticleGenerator
 public:
 	ParticleGenerator() {}
 	// Constructor
-	ParticleGenerator(Shader shader, Texture2D texture, GLuint amount, float scale = 20.0f, float life = 1.0f, float a = 2.5f);
+	ParticleGenerator(Shader shader, Texture2D texture, GLuint amount,
+		float scale = 20.0f, float life = 1.0f, float a = 2.5f);
 	// Update all particles
-	void Update(GLfloat dt, GameObject &object, GLuint newParticles, glm::vec2 offset = glm::vec2(0.0f, 0.0f), int way = 1);
+	void Update(GLfloat dt, GameObject &object, GLuint newParticles,
+		glm::vec2 offset = glm::vec2(0.0f, 0.0f), int way = 1, int type = 0);
 	// Render all particles
 	void Draw();
 	//Á£×Ó¸´Î»
@@ -47,6 +49,7 @@ private:
 	// Returns the first Particle index that's currently unused e.g. Life <= 0.0f or 0 if no particle is currently inactive
 	GLuint firstUnusedParticle();
 	// Respawns particle
-	void respawnParticle(Particle &particle, GameObject &object, glm::vec2 offset = glm::vec2(0.0f, 0.0f), int way = 1);
+	void respawnParticle(Particle &particle, GameObject &object,
+		glm::vec2 offset = glm::vec2(0.0f, 0.0f), int way = 1, int type = 0);
 };
 

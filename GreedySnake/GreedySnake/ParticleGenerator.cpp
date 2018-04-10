@@ -8,12 +8,13 @@ ParticleGenerator::ParticleGenerator(Shader shader, Texture2D texture,
 	this->init();
 }
 
-void ParticleGenerator::Update(GLfloat dt, GameObject &object, GLuint newParticles, glm::vec2 offset, int way)
+void ParticleGenerator::Update(GLfloat dt, GameObject &object, GLuint newParticles,
+	glm::vec2 offset, int way, int type)
 {
 	// Add new particles 
 	for (GLuint i = 0; i < newParticles; ++i){
 		int unusedParticle = this->firstUnusedParticle();//找到第一个未使用的粒子位置
-		this->respawnParticle(this->particles[unusedParticle], object, offset, way);
+		this->respawnParticle(this->particles[unusedParticle], object, offset, way, type);
 	}
 	// Update all particles
 	for (GLuint i = 0; i < this->amount; ++i)
@@ -79,9 +80,6 @@ void ParticleGenerator::init()
 
 	// Create this->amount default particle instances
 	this->particles = std::vector<Particle>(this->amount, Particle());
-	//this->particles.resize(this->amount, Particle());
-	//for (GLuint i = 0; i < this->amount; ++i)
-	//	this->particles.push_back(Particle());
 }
 
 // Stores the index of the last particle used (for quick access to next dead particle)
@@ -108,7 +106,8 @@ GLuint ParticleGenerator::firstUnusedParticle()
 	return 0;
 }
 
-void ParticleGenerator::respawnParticle(Particle &particle, GameObject &object, glm::vec2 offset,int way)
+void ParticleGenerator::respawnParticle(Particle &particle, GameObject &object, 
+	glm::vec2 offset,int way, int type)
 {
 	//随机产生一个粒子
 	//-5到+5的随机数
@@ -132,8 +131,27 @@ void ParticleGenerator::respawnParticle(Particle &particle, GameObject &object, 
 	}
 	else if (way == 3) {
 		glm::vec3 dir;
-		dir.x = cos(180.0f*rColor2);
-		dir.y = sin(180.0f*rColor2);
+		int whichone = rand() % 2;
+		switch (type) {
+		case 0://铜钱形
+			if (whichone == 0) {
+				dir.x = pow(cos(180.0f*rColor2), 3);
+				dir.y = pow(sin(180.0f*rColor2), 3);
+			}
+			else {
+				dir.x = cos(180.0f*rColor2);
+				dir.y = sin(180.0f*rColor2);
+			}
+			break;
+		case 1://心形
+			dir.y = 2 * cos(180.0f*rColor2) - cos(2 * 180.0f*rColor2);
+			dir.x = 2 * sin(180.0f*rColor2) - sin(2 * 180.0f*rColor2);
+			break;
+		case 2://三叶草形
+			dir.x = sin(3 * 180.0f*rColor2)*cos(180.0f*rColor2);
+			dir.y = sin(3 * 180.0f*rColor2)*sin(180.0f*rColor2);
+			break;
+		}
 		GLfloat len = glm::length(object.Velocity);
 		particle.Velocity = len * 0.4f * dir;
 		particle.Color = glm::vec4(rColor1, (rColor2 + 1.0f) / 2.0f*0.8f,(rColor3 + 1.0f) / 2.0f*0.3f, 1.0f);

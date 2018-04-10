@@ -51,7 +51,10 @@ bool CollisionDetect::CheckCollision2(GameObject &one, GameObject &two)
 bool CollisionDetect::CheckCollisionWidthWall(GameObject &one, GLuint &width, GLuint &height)
 {
 	glm::vec2 pos = one.Position;
-	if (pos.x < 0 || (pos.x + one.Size.x) > width)return GL_TRUE;
+	if (pos.x < 0 || (pos.x + one.Size.x) > width) {
+		//std::cout << "WALL->" << (pos.x) << std::endl;
+		return GL_TRUE;
+	}
 	if (pos.y < 0 || (pos.y + one.Size.y) > height)return GL_TRUE;
 	return GL_FALSE;
 }
@@ -61,8 +64,11 @@ bool CollisionDetect::CheckCollision2(glm::vec2 &one, glm::vec2 &size1, glm::vec
 	glm::vec2 center1 = glm::vec2(one + size1 / 2.0f);
 	glm::vec2 center2 = glm::vec2(two + size2 / 2.0f);
 	glm::vec2 difference = center1 - center2;
-	if (glm::length(difference) < size1.x / 3 + size2.x / 3)
+	if (glm::length(difference) < size1.x / 3 + size2.x / 3) {
+		std::cout << one.x << "," << one.y << "->" << two.x << "," << two.y << std::endl;
+		std::cout << "Yes" << std::endl;
 		return GL_TRUE;
+	}
 	else
 		return GL_FALSE;
 }

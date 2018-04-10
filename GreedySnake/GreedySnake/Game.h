@@ -18,7 +18,8 @@ enum GameState {
 	GAME_ACTIVE,
 	GAME_MENU,
 	GAME_WIN,
-	GAME_LOST
+	GAME_LOST,
+	GAME_PAUSE
 };
 
 class Game
@@ -53,7 +54,7 @@ private:
 	std::shared_ptr<SnakeObject> snake;
 	std::shared_ptr<GameObject> food;
 	std::shared_ptr<GameObject> firework;
-	std::shared_ptr<ParticleGenerator> temptation, boom;
+	std::shared_ptr<ParticleGenerator> temptation, boom[3];
 	//算法
 	std::shared_ptr<Algorithm> algorithm;
 	//单元格子大小
@@ -61,7 +62,8 @@ private:
 	GLuint gridX, gridY;
 	glm::vec2 InitVelocity;//初始蛇的速度
 	double timer;//计时器
-	double firetimer;
+	double firetimer[3];//烟花计时
+	int fireindex;//索引到哪个烟花
 	//设置食物位置
 	void SetFoodPos();
 	
@@ -72,5 +74,8 @@ private:
 
 	//重置至初始状态
 	void Reset();
+
+	//AI走一步
+	void GoAhead();
 };
 

@@ -7,6 +7,7 @@ SnakeObject::SnakeObject(glm::vec2 pos, GLfloat radius, glm::vec2 velocity, Text
 {
 	snake.push_back(Body(pos.x, pos.y));
 	snake.front().velocity = this->Velocity;
+	snake.front().Color = glm::vec3(1.0f);
 	AddBody(pos);
 	AddBody(pos);
 }
@@ -16,9 +17,15 @@ SnakeObject::~SnakeObject()
 }
 
 //添加蛇身
-void SnakeObject::AddBody(glm::vec2 pos) {
-	pos = snake.front().pos + this->Velocity;
-	snake.push_front(Body(pos.x, pos.y));
+void SnakeObject::AddBody(glm::vec2 pos, bool way) {
+	if(!way)pos = snake.front().pos + this->Velocity;
+	Body newhead = Body(pos.x, pos.y);
+	//头部颜色保持不变
+	glm::vec3 tmpCol = newhead.Color;
+	newhead.Color = snake.front().Color;
+	snake.front().Color = tmpCol;
+
+	snake.push_front(newhead);
 	this->Position = pos;
 	snake.front().velocity = this->Velocity;
 }
@@ -52,40 +59,42 @@ void SnakeObject::Move(GLfloat dt, Algorithm &algorithm) {
 
 void SnakeObject::MoveByAi(glm::vec2 step, Algorithm &algorithm) {
 	algorithm.Reset();
-	//std::cout << step.x << "," << step.y << std::endl;
-	//std::cout << snake.size() << std::endl;
-	//std::cout << snake.front().pos.x << "," << snake.front().pos.y << std::endl;
-	//std::cout << "begin\n";
+	glm::vec2 tmp = step;
 	for (std::list<Body>::iterator it = snake.begin(); it != snake.end(); ++it) {
 		glm::vec2 prev = it->pos;
-	//	std::cout << "exe??" << std::endl;
-		//std::cout << it->pos.x << "," << it->pos.y << "-";
 		it->pos = step;
 		step = prev;
 		algorithm.Place(it->pos.x / this->Size.x, it->pos.y / this->Size.y);
 	}
-	//std::cout << "end\n";
-	//std::cout << std::endl;
 	this->Position = snake.front().pos;
 }
 
+void SnakeObject::DrawHead(SpriteRenderer &renderer, Texture2D  &sprite) {
+	renderer.DrawSprite(sprite, snake.front().pos, this->Size, this->Rotation, snake.front().Color);
+}
+
 void SnakeObject::Draw(SpriteRenderer &renderer) {
-	for (auto & body : snake) {
-		renderer.DrawSprite(this->Sprite, body.pos, this->Size, this->Rotation, body.Color);
+	auto it = snake.begin();
+	for (++it; it != snake.end(); ++it) {
+		renderer.DrawSprite(this->Sprite, it->pos, this->Size, this->Rotation, it->Color);
 	}
 }
 
 //重置
-void SnakeObject::Reset(glm::vec2 position, glm::vec2 velocity) {
+void SnakeObject::Reset(glm::vec2 position, glm::vec2 velocity, Algorithm &algorithm) {
 	snake.clear();
 	this->Position = position;
 	this->Velocity = velocity;
 	this->nextdir = velocity;
 	snake.push_back(Body(position.x, position.y));
+	snake.front().Color = glm::vec3(1.0f);
 	snake.front().velocity = this->Velocity;
-	AddBody(position);
-	AddBody(position);
+	AddBody(position, false);
+	AddBody(position, false);
 	frameCounter = 1;
+	for (auto it = snake.begin(); it != snake.end(); ++it) {
+		algorithm.Place(it->pos.x / this->Size.x, it->pos.y / this->Size.y);
+	}
 }
 
 glm::vec2 SnakeObject::GetHeadPos() {//获取蛇头位置
@@ -94,9 +103,10 @@ glm::vec2 SnakeObject::GetHeadPos() {//获取蛇头位置
 
 bool SnakeObject::isCollisionSelf(){//是否吃到自己
 	std::list<Body>::iterator it = snake.begin();
-	for (++it; it != snake.end(); ++it) {
-		if (CollisionDetect::CheckCollision2(snake.front().pos, this->Size, it->pos, this->Size))
-		{
+	int counter = 1;
+	for (++it; it != snake.end(); ++it,++counter) {
+		if (CollisionDetect::CheckCollision2(snake.front().pos, this->Size, it->pos, this->Size)){
+			std::cout << "collision->" << counter << " Length->" << snake.size() << std::endl;
 			return GL_TRUE;
 		}
 	}

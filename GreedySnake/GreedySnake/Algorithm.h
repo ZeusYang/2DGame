@@ -13,12 +13,15 @@ struct Node {
 	bool operator>(const Node &n)const {
 		return (this->hn + this->gn) > (n.hn + n.gn);
 	}
+	bool operator<(const Node &n)const {
+		return (this->hn + this->gn) < (n.hn + n.gn);
+	}
 };
 
 //状态，用记录二维数组中每个点的状态，是否被访问过并记录他们的前驱
 struct State {
 	std::pair<int, int> prev;//前驱，前驱为-1代表没有前驱
-	int visited;//0表示未被访问过
+	int visited;//记录是否访问过
 	State() :prev(std::pair<int, int>(-1, -1)), visited(0) {}
 };
 
@@ -40,15 +43,18 @@ public:
 	void Reset();
 	//设置数组中(y,x)为1，代表这个位置被蛇占了
 	void Place(GLuint x, GLuint y);
-	//display
-	void Display();
 
 	//人工智能部分
-	//简单的暴力部分，直接bfs+A星算法算出蛇头到食物的最短距离
-	bool Brute_force(std::pair<int, int> head, std::pair<int, int> dest);
+	//bfs+优选队列寻找一条最优路径
+	bool Search(std::pair<int, int> head, std::pair<int, int> dest,int type);
+	//随便找一条路
+	bool JustFindOne(std::pair<int, int> head);
+	//判断蛇走这一步安不安全
+	bool IsSafe(std::pair<int,int> head,std::pair<int,int> tail, std::pair<int,int> tailPrev, bool isFood);
+	//路径对，存储蛇移动下一步的路径
+	std::pair<int,int> path;
 
-	//路径对路，存储蛇移动的路径
-	std::list<std::pair<int, int>> path;
+	void Display();
 	
 private:
 	GLuint gridX, gridY;

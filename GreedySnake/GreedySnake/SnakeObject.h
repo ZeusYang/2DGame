@@ -34,17 +34,29 @@ public:
 	~SnakeObject();
 
 	//添加蛇身
-	void AddBody(glm::vec2 pos);
+	void AddBody(glm::vec2 pos, bool way = false);
 	//移动蛇身，玩家模式
 	void Move(GLfloat dt, Algorithm &algorithm);
 	//移动蛇身，AI模式
 	void MoveByAi(glm::vec2 step, Algorithm &algorithm);
 	//重置
-	void Reset(glm::vec2 position, glm::vec2 velocity);
+	void Reset(glm::vec2 position, glm::vec2 velocity, Algorithm &algorithm);
 	//渲染
-	void Draw(SpriteRenderer &renderer);
+	//蛇头
+	void DrawHead(SpriteRenderer &render, Texture2D  &Sprite);
+	virtual void Draw(SpriteRenderer &renderer);
 	//获取蛇头位置
 	glm::vec2 GetHeadPos();
+	//获取尾巴位置
+	glm::vec2 GetTailPos() {
+		return snake.back().pos;
+	}
+	//获取倒数第二个的位置
+	glm::vec2 GetTailPrevPos() {
+		auto it = snake.rbegin();
+		++it;
+		return it->pos;
+	}
 	//自己吃自己
 	bool isCollisionSelf();
 private:

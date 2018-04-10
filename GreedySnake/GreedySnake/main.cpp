@@ -8,9 +8,9 @@
 // GLFW function declerations
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 // The Width of the screen
-const GLuint SCREEN_WIDTH = 800;
+const GLuint SCREEN_WIDTH = 810;
 // The height of the screen
-const GLuint SCREEN_HEIGHT = 800;
+const GLuint SCREEN_HEIGHT = 810;
 
 Game snake(SCREEN_WIDTH, SCREEN_HEIGHT);
 
