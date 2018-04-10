@@ -7,11 +7,9 @@
 
 Game::Game(GLuint width, GLuint height)
 	:Width(width),Height(height),State(GAME_MENU), unitX(30), unitY(30),
-	gridX(Width /unitX),gridY(Height/unitY),timer(0.0f),fireindex(0)
-	,mode(2),score(0)
+	gridX(Width /unitX),gridY(Height/unitY),fireindex(0),score(0)
 {
 	firetimer[0] = firetimer[1] = firetimer[2] = 0;
-	InitVelocity = glm::vec2(+unitX, +0);
 	algorithm = std::make_shared<Algorithm>(this->gridY, this->gridX);
 }
 
@@ -51,14 +49,14 @@ void Game::Init() {
 	glm::vec2 headPos = glm::vec2(
 		(gridX - 1) / 2 * unitX, (gridY - 1) / 2 * unitY
 	);
-	snake = std::make_shared<SnakeObject>(headPos, unitX / 2, InitVelocity,
+	snake = std::make_shared<SnakeObject>(headPos, unitX / 2, glm::vec2(unitX,unitY),
 		ResourceManager::GetTexture("snakebody"));
 
 	//食物
 	food = std::make_shared<GameObject>(glm::vec2(0.0, 0.0), glm::vec2(unitX, unitY),
 		ResourceManager::GetTexture("snakebody"));
-	SetFoodPos();
 	food->Velocity = glm::vec2(300, 300);
+	food->Position = Index(algorithm->food->Index);
 	firework = std::make_shared<GameObject>(glm::vec2(0.0, 0.0), glm::vec2(unitX, unitY),
 		ResourceManager::GetTexture("snakebody"));
 	firework->Velocity = glm::vec2(200, 200);
@@ -88,60 +86,26 @@ void Game::Init() {
 			2.0f,//粒子最终寿命
 			1.0f/2.0f//透明度衰减速度
 			);
+	this->Reset();
 }
 
 //处理输入
 void Game::ProcessInput(GLfloat dt) {
-	if (this->State == GAME_ACTIVE && this->mode == 1) {//玩家模式才能移动
-		// 移动挡板
-		if (this->Keys[GLFW_KEY_LEFT]) {//左移
-			if (snake->Velocity != glm::vec2(+unitX, 0)) {//不能往相反的方向走
-				snake->nextdir = glm::vec2(-unitX, 0);
-				KeysProcessed[GLFW_KEY_LEFT] = GL_TRUE;
-			}
-		}
-		if (this->Keys[GLFW_KEY_RIGHT]) {//右移
-			if (snake->Velocity != glm::vec2(-unitX, 0)) {//不能往相反的方向走
-				snake->nextdir = glm::vec2(+unitX, 0);
-				KeysProcessed[GLFW_KEY_RIGHT] = GL_TRUE;
-			}
-		}
-		if (this->Keys[GLFW_KEY_UP]) {//上移
-			if (snake->Velocity != glm::vec2(0, +unitY)) {//不能往相反的方向走
-				snake->nextdir = glm::vec2(0, -unitY);
-				KeysProcessed[GLFW_KEY_UP] = GL_TRUE;
-			}
-		}
-		if (this->Keys[GLFW_KEY_DOWN]) {//下移
-			if (snake->Velocity != glm::vec2(0, -unitY)) {//不能往相反的方向走
-				snake->nextdir = glm::vec2(0, +unitY);
-				KeysProcessed[GLFW_KEY_DOWN] = GL_TRUE;
-			}
-		}
-	}
 	if (this->State == GAME_MENU) {
 		if (this->Keys[GLFW_KEY_ENTER] && !this->KeysProcessed[GLFW_KEY_ENTER]) {//确定
 			this->State = GAME_ACTIVE;
 			this->KeysProcessed[GLFW_KEY_ENTER] = GL_TRUE;
 			Reset();//重置
 		}
-		if (this->Keys[GLFW_KEY_1] && !this->KeysProcessed[GLFW_KEY_1]) {//玩家模式
-			this->mode = 1;
-			this->KeysProcessed[GLFW_KEY_1] = GL_TRUE;
-		}
-		if (this->Keys[GLFW_KEY_2] && !this->KeysProcessed[GLFW_KEY_2]) {//AI模式
-			this->mode = 2;
-			this->KeysProcessed[GLFW_KEY_2] = GL_TRUE;
-		}
 	}
-	if (this->State == GAME_LOST || this->State == GAME_WIN) {//游戏输赢之后按确定重新游戏
+	if (this->State == GAME_LOST || this->State == GAME_WIN) {//游戏输赢之后按确定重新开始
 		if (this->Keys[GLFW_KEY_ENTER] && !this->KeysProcessed[GLFW_KEY_ENTER]){
 			this->KeysProcessed[GLFW_KEY_ENTER] = GL_TRUE;
 			this->State = GAME_MENU;
 			Reset();
 		}
 	}
-	if (this->State == GAME_ACTIVE && this->mode == 2) {
+	if (this->State == GAME_ACTIVE) {
 		if (this->Keys[GLFW_KEY_P] && !this->KeysProcessed[GLFW_KEY_P]) {//暂停
 			this->State = GAME_PAUSE;
 			this->KeysProcessed[GLFW_KEY_P] = GL_TRUE;
@@ -157,48 +121,25 @@ void Game::ProcessInput(GLfloat dt) {
 
 //游戏更新
 void Game::Update(GLfloat dt) {
-	if (this->State == GAME_ACTIVE && this->mode == 1) {//玩家模式
-		//蛇身移动
-		snake->Move(dt, *algorithm);
-		//做碰撞检测
-		DoCollisions();
-	}
 	
-	if (this->State == GAME_ACTIVE && this->mode == 2) {//AI模式
-		//要注意x和y的顺序是相反的
-		//蛇头位置
-		std::pair<int, int> src(snake->GetHeadPos().y / snake->Size.y,
-			snake->GetHeadPos().x / snake->Size.x);
-		//食物位置
-		std::pair<int, int>det(food->Position.y / food->Size.y,
-			food->Position.x / food->Size.x);
-		//尾巴位置
-		std::pair<int, int> tail(snake->GetTailPos().y / snake->Size.y,
-			snake->GetTailPos().x / snake->Size.x);
-		//尾巴前面的位置
-		std::pair<int,int> tailPrev(snake->GetTailPrevPos().y / snake->Size.y,
-			snake->GetTailPrevPos().x / snake->Size.x);
-		if (algorithm->Search(src, det, 1) 
-			&& algorithm->IsSafe(src,tail,tailPrev,algorithm->path == det)) {//找到了路
-			GoAhead();
+	if (this->State == GAME_ACTIVE ) {//AI模式
+		glm::ivec2 move = algorithm->AIThinking();
+		if (move == glm::ivec2(-1, -1))this->State = GAME_LOST;
+		else {
+			bool isCollision = algorithm->make_move(move);
+			if (isCollision) {//碰撞,boom
+				fireindex = (fireindex + 1) % 3;
+				firetimer[fireindex] = 2.0f;
+				firework->Position = food->Position;
+				boom[fireindex]->Reset();
+				boom[fireindex]->Update(0.f, *firework, 400, firework->Size / 2.0f, 3, fireindex);
+				sound->play2D("../res/Audio/get.wav", GL_FALSE);
+				//获取一分
+				++score;
+			}
+			food->Position = Index(algorithm->food->Index);
 		}
-		else {//没找到路或不安全,去找尾巴的路
-			if (algorithm->Search(src, tail, 2)) {//找到了去尾巴的路
-			//	std::cout << "go tail" << std::endl;
-				GoAhead();
-			}
-			else if (algorithm->JustFindOne(src)) {//随便走走
-				std::cout << "just go" << std::endl;
-				GoAhead();
-			}
-			else {//没路，失败了
-				State = GAME_LOST;
-			}
-		}
-		//做碰撞检测
-		//DoCollisions();
 	}
-
 	//粒子更新
 	temptation->Update(dt, *food, 8, food->Size / 20.f, 2);
 	//烟花爆炸
@@ -231,8 +172,7 @@ void Game::Render() {
 		);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 		//蛇身
-		snake->DrawHead(*sprite, ResourceManager::GetTexture("snakehead"));
-		snake->Draw(*sprite);
+		snake->DrawSnake(algorithm->snake, *sprite, ResourceManager::GetTexture("snakehead"));
 		//食物
 		food->Draw(*sprite);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -257,78 +197,12 @@ void Game::Render() {
 	}
 }
 
-//碰撞检测
-void Game::DoCollisions() {
-	if (State == GAME_ACTIVE) {
-		//贪吃蛇吃到食物
-		if (CollisionDetect::CheckCollision2(*snake, *food)) {
-			if(this->mode == 1)snake->AddBody(food->Position);//增加一节蛇身
-			//发射爆炸烟花
-			fireindex = (fireindex + 1) % 3;
-			firetimer[fireindex] = 2.0f;
-			firework->Position = food->Position;
-			boom[fireindex]->Reset();
-			boom[fireindex]->Update(0.f, *firework, 400, firework->Size / 2.0f, 3, fireindex);
-			SetFoodPos();//重新生成食物
-			sound->play2D("../res/Audio/get.wav", GL_FALSE);
-			//获取一分
-			++score;
-		}
-
-		//撞到墙壁
-		if (CollisionDetect::CheckCollisionWidthWall(*snake, this->Width, this->Height)) {
-			this->State = GAME_LOST;
-			sound->play2D("../res/Audio/dead.mp3", GL_FALSE);
-		}
-		
-		//自己吃自己
-		if (snake->isCollisionSelf()) {
-			this->State = GAME_LOST;
-			sound->play2D("../res/Audio/dead.mp3", GL_FALSE);
-		}
-	}
-}
-
-//设置食物位置
-void Game::SetFoodPos() {
-	int x1 = rand() % gridY;
-	int y1 = rand() % gridX;
-	while (!algorithm->CouldPlaceFood(x1, y1)) {//一直找到能够放置食物的地方
-		x1 = rand() % gridY;
-		y1 = rand() % gridX;
-	}
-	food->Position = glm::vec2(y1*unitX, x1*unitY);
-}
-
 //重置至初始状态
 void Game::Reset(){
-	timer = 0.0f;
 	fireindex = 0;
 	firetimer[0] = firetimer[1] = firetimer[2] = 0.0f;
 	score = 0;
-	glm::vec2 headPos = glm::vec2(
-		(gridX - 1) / 2 * unitX, (gridY - 1) / 2 * unitY
-	);
-	snake->Reset(headPos, InitVelocity, *algorithm);
-}
-
-void Game::GoAhead() {
-	std::pair<int, int> next = algorithm->path;
-	glm::vec2 step = glm::vec2(next.second*snake->Size.x, next.first*snake->Size.y);
-	if (step == food->Position) {//如果下一步是食物的话直接增加一节身体
-		snake->AddBody(step, true);
-		algorithm->Place(next.second, next.first);
-
-		//碰撞,boom
-		fireindex = (fireindex + 1) % 3;
-		firetimer[fireindex] = 2.0f;
-		firework->Position = food->Position;
-		boom[fireindex]->Reset();
-		boom[fireindex]->Update(0.f, *firework, 400, firework->Size / 2.0f, 3, fireindex);
-		SetFoodPos();//重新生成食物
-		sound->play2D("../res/Audio/get.wav", GL_FALSE);
-		//获取一分
-		++score;
-	}
-	else snake->MoveByAi(step, *algorithm);
+	algorithm->ResetSnakeAndFood();
+	food->Position = Index(algorithm->food->Index);
+	snake->Position = Index(algorithm->snake.front().Index);
 }

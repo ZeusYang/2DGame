@@ -25,12 +25,10 @@ enum GameState {
 class Game
 {
 public:
-
 	GLboolean		Keys[1024];//键盘响应
 	GLboolean		KeysProcessed[1024];
 	GLuint			Width, Height;//游戏宽高
 	GameState		State;//游戏状态
-
 	Game(GLuint width,GLuint height);
 	~Game();
 	//游戏初始化
@@ -41,11 +39,8 @@ public:
 	void Update(GLfloat dt);
 	//渲染
 	void Render();
-	//碰撞检测
-	void DoCollisions();
 
 private:
-
 	//游戏控件
 	std::shared_ptr<SpriteRenderer> sprite;
 	std::shared_ptr<TextRenderer> text;
@@ -55,27 +50,18 @@ private:
 	std::shared_ptr<GameObject> food;
 	std::shared_ptr<GameObject> firework;
 	std::shared_ptr<ParticleGenerator> temptation, boom[3];
-	//算法
-	std::shared_ptr<Algorithm> algorithm;
+	std::shared_ptr<Algorithm> algorithm;//算法
 	//单元格子大小
 	int unitX, unitY;
 	GLuint gridX, gridY;
-	glm::vec2 InitVelocity;//初始蛇的速度
-	double timer;//计时器
 	double firetimer[3];//烟花计时
 	int fireindex;//索引到哪个烟花
-	//设置食物位置
-	void SetFoodPos();
-	
-	//游戏模式
-	int mode;
-	//当前分数
-	int score;
-
+	int score;//当前分数
 	//重置至初始状态
 	void Reset();
-
-	//AI走一步
-	void GoAhead();
+	//将二维数组转换成UI坐标，注意顺序是相反的
+	inline glm::vec2 Index(const glm::ivec2 &index) {
+		return glm::vec2(index.y*unitX, index.x*unitY);
+	}
 };
 
