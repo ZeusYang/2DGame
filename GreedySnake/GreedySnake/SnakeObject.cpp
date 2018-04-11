@@ -18,7 +18,7 @@ void SnakeObject::DrawSnake(std::list<Object> &target, SpriteRenderer &renderer,
 	for (++it; it != target.end(); ++it) {
 		renderer.DrawSprite(this->Sprite, Index(it->Index), this->Size, this->Rotation, it->Color);
 	}
-	
+	renderer.DrawSprite(headSprite, Index(target.back().Index), this->Size, this->Rotation, target.back().Color);//Î²²¿
 }
 
 

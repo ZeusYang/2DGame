@@ -3,3 +3,5 @@ freetype28.lib
 glew32.lib
 glfw3dll.lib
 irrKlang.lib
+
+path=%path%;../../Dependencies/dll;

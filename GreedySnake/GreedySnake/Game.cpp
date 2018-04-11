@@ -82,7 +82,7 @@ void Game::Init() {
 			ResourceManager::GetShader("particle"),
 			ResourceManager::GetTexture("particle"),
 			410,//粒子数量
-			unitX*1.5,//粒子大小
+			unitX*1.1,//粒子大小
 			2.0f,//粒子最终寿命
 			1.0f/2.0f//透明度衰减速度
 			);
@@ -123,9 +123,12 @@ void Game::ProcessInput(GLfloat dt) {
 void Game::Update(GLfloat dt) {
 	
 	if (this->State == GAME_ACTIVE ) {//AI模式
+		//AI策略
 		glm::ivec2 move = algorithm->AIThinking();
+		//没找到任何路径，游戏结束
 		if (move == glm::ivec2(-1, -1))this->State = GAME_LOST;
 		else {
+			//走出一步
 			bool isCollision = algorithm->make_move(move);
 			if (isCollision) {//碰撞,boom
 				fireindex = (fireindex + 1) % 3;
@@ -137,7 +140,11 @@ void Game::Update(GLfloat dt) {
 				//获取一分
 				++score;
 			}
-			food->Position = Index(algorithm->food->Index);
+			if (algorithm->win) {//满屏了
+				State = GAME_WIN;
+				return;
+			}
+			food->Position = Index(algorithm->food->Index);//更新食物位置
 		}
 	}
 	//粒子更新
