@@ -187,7 +187,7 @@ void Game::Render() {
 		//»æÖÆ±éÀúÂ·¾¶
 		Texture2D &tmp1 = ResourceManager::GetTexture("wall");
 		for (auto it = maze->paths.begin(); it != maze->paths.end(); ++it) {
-			sprite->DrawSprite(tmp1, *it, glm::vec2(unitX*0.8, unitY*0.8), 0, glm::vec3(0.0, 1.0, 0.0));
+			sprite->DrawSprite(tmp1, *it, glm::vec2(unitX*0.8, unitY*0.8), 0, glm::vec3(0.0, 0.0, 1.0));
 		}
 
 		for (auto it = maze->solution.begin(); it != maze->solution.end(); ++it) {

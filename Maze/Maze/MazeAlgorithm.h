@@ -10,15 +10,14 @@ enum Neighbor { LEFT = 0, UP = 1, RIGHT = 2, DOWN = 3 };
 struct Cell {//迷宫单元
 	int neighbors[4];//四个方向的邻居
 	int visited;//记录是否访问过了
-	//以下两个用于寻路算法
-	int isPath;
+	//以下用于寻路算法
 	glm::ivec2 prev;//记录前驱
-	//A星算法
+	//用于A星算法的open表、closed表
 	bool inOpen, inClosed;
 	//启发式函数fn = gn + hn
-	//其中gn为起点到n的实际距离，hn为n到终点的直线距离
+	//其中gn为起点到n的实际距离，hn为n到终点的哈密顿
 	int gn, hn;
-	Cell() :visited(0), isPath(0),inOpen(false),inClosed(false) {
+	Cell() :visited(0),inOpen(false),inClosed(false) {
 		neighbors[LEFT] = neighbors[UP] = neighbors[RIGHT] = neighbors[DOWN] = 0;
 	}
 };
@@ -74,7 +73,7 @@ private:
 		glm::ivec2 index;//cells数组的下标索引
 		Node(int r, int c) :index((glm::ivec2(r, c))) {}
 	};
-	class Compare {//游戏队列的比较仿函数对象
+	class Compare {//优先队列的比较仿函数对象
 	public:
 		bool operator()(const Node& n1, const Node& n2) {
 			return cells[n1.index.x][n1.index.y].gn + cells[n1.index.x][n1.index.y].hn

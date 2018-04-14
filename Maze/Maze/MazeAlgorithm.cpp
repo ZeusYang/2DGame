@@ -116,18 +116,17 @@ void MazeAlgorithm::GetPathFromCells() {
 }
 
 bool MazeAlgorithm::Generator_Dfs() {
-	frame = 5;
+	frame = 10;//用于演示动画
 	while (!record.empty() && frame--) {//当队列或者frame不减到0时
 		cells[cur.x][cur.y].visited = 1;//标记当前的位置为访问过的了
 		bool hasNeigh = false;//是否有邻居未访问
 		std::vector<std::pair<glm::ivec2,int>> tmp; //记录未访问的邻居, tmp.second代表它是哪个邻居
-		tmp.reserve(4);
 		glm::ivec2 loc;
 		//寻找是否存在未访问的邻居
 		for (auto x = 0; x < 4; ++x) {
 			loc = glm::ivec2(cur.x + to[x][0], cur.y + to[x][1]);
 			if (CouldMove(loc) && !cells[loc.x][loc.y].visited) {//有未访问的邻居
-				tmp.push_back({ loc,x });
+				tmp.push_back({ loc,x });//加入tmp中，然后随机选择一个
 				hasNeigh = true;
 			}
 		}
@@ -140,12 +139,11 @@ bool MazeAlgorithm::Generator_Dfs() {
 			//令当前标记变为该邻居
 			cur = tmp[got].first;
 		}
-		else {//没找到一个邻居，是时候回溯了
+		else {//没找到一个未被访问的邻居，是时候回溯了
 			cur = record.top();
 			record.pop();
 		}
 	}
-	//frame = 1;
 	//栈尾空代表已经结束了
 	if (record.empty())return true;
 	else return false;
@@ -178,7 +176,7 @@ bool MazeAlgorithm::Generator_Prim() {
 				}
 			}
 		}
-		//有被访问过的邻居
+		//有未被访问过的邻居
 		if (!tmp.empty()) {
 			//从中随机选一个，打通他们之间的墙
 			int got = rand() % tmp.size();
