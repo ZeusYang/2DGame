@@ -43,11 +43,14 @@ private:
 	//游戏控件
 	std::shared_ptr<SpriteRenderer> sprite;
 	std::shared_ptr<TextRenderer> text;
-	std::shared_ptr<PostProcessor> effects;
 	std::shared_ptr<ISoundEngine> sound;
 	std::shared_ptr<GameObject> wall;
-	std::shared_ptr<ParticleGenerator> temptation, boom[3];
+	std::shared_ptr<GameObject> terminal;
+	std::shared_ptr<GameObject> player;
 	std::shared_ptr<MazeAlgorithm> maze;
+	std::shared_ptr<ParticleGenerator> particle;
+	//迷宫生成算法
+	int type;
 	//单元格子大小
 	int unitX, unitY;
 	GLuint gridX, gridY;

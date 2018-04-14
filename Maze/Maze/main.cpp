@@ -4,13 +4,13 @@
 #include <iostream>
 #include "Game.h"
 #include "ResourceManager.h"
-//#pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" )
+#pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"" )
 // GLFW function declerations
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 // The Width of the screen
-const GLuint SCREEN_WIDTH = 900;
+const GLuint SCREEN_WIDTH = 1400;
 // The height of the screen
-const GLuint SCREEN_HEIGHT = 900;
+const GLuint SCREEN_HEIGHT = 800;
 
 Game snake(SCREEN_WIDTH, SCREEN_HEIGHT);
 
