@@ -43,7 +43,7 @@ public:
 private:
 	//ÓÎÏ·¿Ø¼ş
 	std::shared_ptr<SpriteRenderer> sprite;
-	std::shared_ptr<TextRenderer> text;
+	//std::shared_ptr<TextRenderer> text;
 	std::shared_ptr<PostProcessor> effects;
 	std::shared_ptr<ISoundEngine> sound;
 	std::shared_ptr<SnakeObject> snake;

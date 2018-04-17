@@ -6,7 +6,7 @@
 #include <sstream>
 
 Game::Game(GLuint width, GLuint height)
-	:Width(width),Height(height),State(GAME_MENU), unitX(30), unitY(30),
+	:Width(width),Height(height),State(GAME_ACTIVE), unitX(30), unitY(30),
 	gridX(Width /unitX),gridY(Height/unitY),fireindex(0),score(0)
 {
 	firetimer[0] = firetimer[1] = firetimer[2] = 0;
@@ -20,12 +20,12 @@ Game::~Game()
 //游戏初始化
 void Game::Init() {
 	// 加载着色器
-	ResourceManager::LoadShader("../res/Shaders/Sprite.vert",
-		"../res/Shaders/Sprite.frag", nullptr, "sprite");
-	ResourceManager::LoadShader("../res/Shaders/Particle.vert",
-		"../res/Shaders/Particle.frag", nullptr, "particle");
-	ResourceManager::LoadShader("../res/Shaders/Effect.vert",
-		"../res/Shaders/Effect.frag", nullptr, "postprocessing");
+	ResourceManager::LoadShader("res/Shaders/Sprite.vert",
+		"res/Shaders/Sprite.frag", nullptr, "sprite");
+	ResourceManager::LoadShader("res/Shaders/Particle.vert",
+		"res/Shaders/Particle.frag", nullptr, "particle");
+	ResourceManager::LoadShader("res/Shaders/Effect.vert",
+		"res/Shaders/Effect.frag", nullptr, "postprocessing");
 
 	// 配置着色器
 	glm::mat4 projection = glm::ortho(0.0f, static_cast<GLfloat>(this->Width),
@@ -40,10 +40,10 @@ void Game::Init() {
 	sprite = std::make_shared<SpriteRenderer>(ResourceManager::GetShader("sprite"));
 
 	// 加载纹理
-	ResourceManager::LoadTexture("../res/Textures/background.png", GL_FALSE, "background");
-	ResourceManager::LoadTexture("../res/Textures/particle.bmp", GL_FALSE, "snakebody");
-	ResourceManager::LoadTexture("../res/Textures/head.png", GL_FALSE, "snakehead");
-	ResourceManager::LoadTexture("../res/Textures/Light.png", GL_FALSE, "particle");
+	ResourceManager::LoadTexture("res/Textures/background.png", GL_FALSE, "background");
+	ResourceManager::LoadTexture("res/Textures/particle.bmp", GL_FALSE, "snakebody");
+	ResourceManager::LoadTexture("res/Textures/head.png", GL_FALSE, "snakehead");
+	ResourceManager::LoadTexture("res/Textures/Light.png", GL_FALSE, "particle");
 
 	//蛇
 	glm::vec2 headPos = glm::vec2(
@@ -64,10 +64,10 @@ void Game::Init() {
 	effects = std::make_shared<PostProcessor>(ResourceManager::GetShader("postprocessing"),
 		this->Width, this->Height);
 	//文本显示
-	text = std::make_shared<TextRenderer>(this->Width, this->Height);
-	text->Load("../res/Fonts/ocraext.TTF", 24);
+	//text = std::make_shared<TextRenderer>(this->Width, this->Height);
+	//text->Load("res/Fonts/ocraext.TTF", 24);
 	//背景音乐
-	sound->play2D("../res/Audio/greedysnake.mp3", GL_TRUE);
+	sound->play2D("res/Audio/greedysnake.mp3", GL_TRUE);
 	//粒子特效
 	temptation = std::make_shared<ParticleGenerator>(
 		ResourceManager::GetShader("particle"),
@@ -136,7 +136,7 @@ void Game::Update(GLfloat dt) {
 				firework->Position = food->Position;
 				boom[fireindex]->Reset();
 				boom[fireindex]->Update(0.f, *firework, 400, firework->Size / 2.0f, 3, fireindex);
-				sound->play2D("../res/Audio/get.wav", GL_FALSE);
+				sound->play2D("res/Audio/get.wav", GL_FALSE);
 				//获取一分
 				++score;
 			}
@@ -190,18 +190,18 @@ void Game::Render() {
 		if (firetimer[1]>0)boom[1]->Draw();
 		if (firetimer[2]>0)boom[2]->Draw();
 		//分数
-		text->RenderText("Score:" + ss.str(), 5.0f, 5.0f, 1.0f);
+		//text->RenderText("Score:" + ss.str(), 5.0f, 5.0f, 1.0f);
 	}
-	if (this->State == GAME_MENU) {
-		Menu::Selection(*text, this->Width, this->Height);
-	}
-	if (this->State == GAME_WIN) {
-		Menu::Win(*text, this->Width, this->Height);
-	}
-	if(this->State == GAME_LOST){
-		//分数
-		Menu::Lost(*text, this->Width, this->Height, ss.str());
-	}
+	//if (this->State == GAME_MENU) {
+	//	Menu::Selection(*text, this->Width, this->Height);
+	//}
+	//if (this->State == GAME_WIN) {
+	//	Menu::Win(*text, this->Width, this->Height);
+	//}
+	//if(this->State == GAME_LOST){
+	//	//分数
+	//	Menu::Lost(*text, this->Width, this->Height, ss.str());
+	//}
 }
 
 //重置至初始状态
