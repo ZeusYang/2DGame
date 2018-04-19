@@ -83,8 +83,7 @@ void SpriteRenderer::SetInstance(const std::vector<CharList*> &target) {
 }
 
 void SpriteRenderer::DrawSprite(Texture2D &texture, glm::vec2 position,
-	glm::vec2 size, GLfloat rotate, glm::vec3 color)
-{
+	glm::vec2 size, GLfloat rotate, glm::vec3 color){
 	this->shader.Use();
 	//∞Û∂®Œ∆¿Ì
 	glActiveTexture(GL_TEXTURE0);

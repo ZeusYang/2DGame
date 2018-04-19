@@ -1,8 +1,7 @@
 #include "CharList.h"
 
 CharList::CharList(float zn, float zf, float ap, float fy)
-	:size(1.0f), znear(zn), zfar(zf), aspect(ap), fovy(fy)
-{
+	:size(1.0f), znear(zn), zfar(zf), aspect(ap), fovy(fy){
 	//×Ö·ûÁ´µÄ×Ö·ûÊýÁ¿
 	num = 15 + rand() % 10;
 	RndPos();//Ëæ»úÎ»ÖÃ
@@ -42,6 +41,7 @@ void CharList::Move(float dt) {
 		e.Color.w = alpha;
 		alpha -= 1.0f / num;
 		e.Pos.z += vel.z;
+		//e.Pos.w = size * 2;
 	}
 	pos = necklace.front().Pos;
 }
@@ -50,8 +50,7 @@ bool CharList::IsOufScreen() {
 	//ÅÐ¶ÏÊÇ·ñÆ®³öÆÁÄ»
 	double range = tan(glm::radians(fovy))*pos.z;
 	float length = num * size;
-	if (pos.z >= -znear || pos.z <= -this->zfar || pos.y < (range - length))
-	{
+	if (pos.z >= -znear || pos.z <= -this->zfar || pos.y < (range - length)){
 		return true;
 	}
 	return false;

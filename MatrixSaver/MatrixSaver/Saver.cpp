@@ -56,7 +56,7 @@ void Saver::Init() {
 	ResourceManager::GetShader("sprite").Use().SetInteger("image", 0);
 	ResourceManager::GetShader("sprite").SetMatrix4("projection", projection);
 	//50个字符链
-	for (auto x = 0; x < 100; ++x) {
+	for (auto x = 0; x < 200; ++x) {
 		matrix.push_back(new CharList(znear, zfar, aspect, fovy));
 	}
 	//渲染精灵，采用实例化渲染
