@@ -41,6 +41,17 @@ void ResourceManager::Clear()
 		glDeleteTextures(1, &iter.second.ID);
 }
 
+//¥”stringº”‘ÿshader
+Shader ResourceManager::LoadShaderFromString(std::string vShader, std::string fShader, std::string name) {
+	const GLchar *vShaderCode = vShader.c_str();
+	const GLchar *fShaderCode = fShader.c_str();
+	// 2. Now create shader object from source code
+	Shader shader;
+	shader.Compile(vShaderCode, fShaderCode, nullptr);
+	Shaders[name] = shader;
+	return Shaders[name];
+}
+
 Shader ResourceManager::loadShaderFromFile(const GLchar *vShaderFile, const GLchar *fShaderFile,
 	const GLchar *gShaderFile)
 {

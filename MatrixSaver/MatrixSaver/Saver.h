@@ -1,14 +1,21 @@
 #pragma once
 #include "Shader.h"
 #include "Texture2D.h"
+#include "CharList.h"
+#include "SpriteRenderer.h"
+#include <list>
+#include <memory>
+#include <glm/gtc/matrix_transform.hpp>
 
 class Saver{
 public:
 	GLboolean		Keys[1024];//¼üÅÌÏìÓ¦
 	GLboolean		KeysProcessed[1024];
 	GLuint			Width, Height;//´°¿Ú¿í¸ß
+	float znear, zfar, aspect, fovy;
 
-	Saver(GLuint width, GLuint height);
+	Saver(GLuint width = 800, GLuint height = 600,
+		GLfloat zn = 1.0f, GLfloat zf = 70.0f, GLfloat ap = 1.0, GLfloat fy = 45.0f);
 
 	~Saver() = default;
 
@@ -22,6 +29,8 @@ public:
 	void Render();
 
 private:
-
+	std::vector<CharList*> matrix;
+	std::shared_ptr<SpriteRenderer> sprite;
+	float timeCounter;
 };
 

@@ -17,6 +17,10 @@ public:
 	static Shader   LoadShader(const GLchar *vShaderFile, const GLchar *fShaderFile,
 		const GLchar *gShaderFile, std::string name);//name是着色器名称，自己命名，用于索引
 
+	//从string加载shader
+	//static Shader	LoadShaderFromString(std::string vShader, std::string fShader, std::string name);
+	static Shader	LoadShaderFromString(std::string vShader, std::string fShader, std::string name);
+
 	// Retrieves a stored shader
 	static Shader   GetShader(std::string name);
 

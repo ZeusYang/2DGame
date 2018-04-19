@@ -33,7 +33,10 @@
     <ClCompile Include="Saver.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="PointSprite.cpp">
+    <ClCompile Include="SpriteRenderer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CharList.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,7 +53,10 @@
     <ClInclude Include="Saver.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="PointSprite.h">
+    <ClInclude Include="SpriteRenderer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CharList.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
