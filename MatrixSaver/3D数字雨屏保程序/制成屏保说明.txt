@@ -1,3 +1,3 @@
-1、将MatrixSaver.scr和number.png放到C:/Windows目录下
+1、将MatrixSaver.scr和number.png和其余两个dll文件放到C:/Windows目录下
 2、在相应的屏保选择选项中选择MatrixSaver作为屏保程序
 例：在win8.1下，右键桌面空白部分，选择“个性化”->屏幕保护程序->在对话框的下拉框中选择MatrixSaver，然后“确定”

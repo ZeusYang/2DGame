@@ -8,8 +8,6 @@ struct Symbol {//单个字符
 	glm::vec4 Coord;//纹理坐标的移动
 };
 
-#define M_PI 3.1415926535
-
 class CharList{
 public:
 	CharList(float zn, float zf, float ap, float fy);
@@ -28,6 +26,7 @@ public:
 	int num;//字符数量
 	
 private:
+	//单个字符大小、近平面、远平面、宽高比、视锥范围夹角
 	float size, znear, zfar, aspect, fovy;
 	
 	void RndPos();//随机位置

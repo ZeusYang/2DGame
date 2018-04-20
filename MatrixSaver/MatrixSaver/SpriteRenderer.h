@@ -13,7 +13,7 @@ public:
 	//实例化
 	void SetInstance(const std::vector<CharList*> &target);
 
-	 //绘制精灵，指定纹理、位置、大小、旋转度、颜色
+	 //绘制精灵，除了纹理，其余参数都没用到
 	void DrawSprite(Texture2D &texture, glm::vec2 position = glm::vec2(0, 0),
 		glm::vec2 size = glm::vec2(10, 10), GLfloat rotate = 0.0f,
 		glm::vec3 color = glm::vec3(1.0f));
