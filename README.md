@@ -23,3 +23,9 @@ A snake AI to eat as much as possible food. Here is the [blog](https://blog.csdn
 由OpenGL3.3+制作的3D数字雨屏保程序，详细内容请看[博客](https://blog.csdn.net/qq_31615919/article/details/80007969)
 
 ![picture](https://github.com/ZeusYang/Breakout/blob/master/screenshot/screenSaver.gif)
+
+**俄罗斯方块**
+
+由Qt5制作的一个俄罗斯方块游戏，用来练习和熟练Qt的编程模式.
+
+![picture](https://github.com/ZeusYang/2DGame/blob/master/screenshot/Tetris.png)
